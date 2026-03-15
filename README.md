@@ -63,7 +63,8 @@ kill $(lsof -ti :9292)
 
 ## Future ideas
 
-- Configurable message via flag or env var
+- [Factor out go-away message to a constant string](https://github.com/doolin/port-occupier/issues/2)
+- [Configurable message via flag or env var](https://github.com/doolin/port-occupier/issues/1)
 - Occupy multiple ports from a config file
 - launchd plist / systemd unit for auto-start
 - Log connection attempts (who tried to bind?)
