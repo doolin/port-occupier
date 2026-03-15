@@ -67,3 +67,4 @@ kill $(lsof -ti :9292)
 - Occupy multiple ports from a config file
 - launchd plist / systemd unit for auto-start
 - Log connection attempts (who tried to bind?)
+- Custom application icon
