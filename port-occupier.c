@@ -9,6 +9,8 @@
 
 static volatile sig_atomic_t running = 1;
 static int server_fd = -1;
+static const char *OCCUPIED_MSG_FMT =
+    "Port %d is intentionally occupied by port-occupier. Find your own port.\n";
 
 static void handle_signal(int sig) {
     (void)sig;
@@ -66,8 +68,7 @@ int run_port_occupier(int argc, char *argv[]) {
             continue;
 
         char msg[128];
-        int len = snprintf(msg, sizeof(msg),
-            "Port %d is intentionally occupied by port-occupier. Find your own port.\n", port);
+        int len = snprintf(msg, sizeof(msg), OCCUPIED_MSG_FMT, port);
         write(client_fd, msg, len);
         close(client_fd);
     }
