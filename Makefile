@@ -1,14 +1,14 @@
 CC ?= cc
 CFLAGS = -Wall -Wextra -Os -DSTANDALONE
-TARGET = port-occupier
+TARGET = port-protector
 
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 LOGDIR = $(PREFIX)/var/log
-PLIST_NAME = com.local.port-occupier.plist
+PLIST_NAME = com.local.port-protector.plist
 PLIST_DIR = /Library/LaunchDaemons
 
-$(TARGET): port-occupier.c
+$(TARGET): port-protector.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 install: $(TARGET)
@@ -22,7 +22,7 @@ uninstall:
 	launchctl bootout system/$(PLIST_NAME:.plist=) || true
 	rm -f $(PLIST_DIR)/$(PLIST_NAME)
 	rm -f $(BINDIR)/$(TARGET)
-	rm -f $(LOGDIR)/port-occupier.log
+	rm -f $(LOGDIR)/port-protector.log
 
 clean:
 	rm -f $(TARGET)

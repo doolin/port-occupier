@@ -10,14 +10,14 @@
 static volatile sig_atomic_t running = 1;
 static int server_fd = -1;
 static const char *OCCUPIED_MSG_FMT =
-    "Port %d is intentionally occupied by port-occupier. Find your own port.\n";
+    "Port %d is intentionally occupied by port-protector. Find your own port.\n";
 
 static void handle_signal(int sig) {
     (void)sig;
     running = 0;
 }
 
-int run_port_occupier(int argc, char *argv[]) {
+int run_port_protector(int argc, char *argv[]) {
     unsigned short port = 9292;
 
     if (argc > 1) {
@@ -60,7 +60,7 @@ int run_port_occupier(int argc, char *argv[]) {
         return 1;
     }
 
-    fprintf(stderr, "port-occupier: holding port %d\n", port);
+    fprintf(stderr, "port-protector: holding port %d\n", port);
 
     while (running) {
         int client_fd = accept(server_fd, NULL, NULL);
@@ -74,12 +74,12 @@ int run_port_occupier(int argc, char *argv[]) {
     }
 
     close(server_fd);
-    fprintf(stderr, "port-occupier: released port %d\n", port);
+    fprintf(stderr, "port-protector: released port %d\n", port);
     return 0;
 }
 
 #ifdef STANDALONE
 int main(int argc, char *argv[]) {
-    return run_port_occupier(argc, argv);
+    return run_port_protector(argc, argv);
 }
 #endif

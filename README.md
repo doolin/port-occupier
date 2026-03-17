@@ -1,4 +1,4 @@
-# port-occupier
+# port-protector
 
 A minimal daemon that occupies a specific TCP port to prevent local
 development services from binding to it. Useful when you're tired of
@@ -10,7 +10,7 @@ ports.
 Local development tools default to fixed ports (e.g., 9292 for Rack).
 When multiple projects or habits converge on the same port, you get
 silent conflicts, stale processes, or worse — connecting to the wrong
-service. Port-occupier makes the conflict loud and immediate: the
+service. Port-protector makes the conflict loud and immediate: the
 other tool fails to bind, and you know right away.
 
 ## Design
@@ -19,7 +19,7 @@ other tool fails to bind, and you know right away.
 - **Mechanism:** `bind()` + `listen()` on the target port, then `pause()` forever
 - **Resource usage:** One socket fd, one process, near-zero memory
 - **Message (optional):** Accepts connections and sends a short message
-  ("Port 9292 is intentionally occupied by port-occupier") before
+  ("Port 9292 is intentionally occupied by port-protector") before
   closing, so `curl localhost:9292` tells you what's going on
 
 ## Behavior
@@ -36,17 +36,17 @@ other tool fails to bind, and you know right away.
 make
 
 # Run (default port 9292)
-./port-occupier
+./port-protector
 
 # Run on a different port
-./port-occupier 3000
+./port-protector 3000
 
 # Run as a background daemon
-./port-occupier &
+./port-protector &
 
 # Verify it works
 curl localhost:9292
-# => Port 9292 is intentionally occupied by port-occupier
+# => Port 9292 is intentionally occupied by port-protector
 
 # Now rackup will fail immediately:
 rackup
@@ -61,10 +61,58 @@ kill $(lsof -ti :9292)
 - A C compiler (cc/gcc/clang)
 - POSIX system (macOS, Linux)
 
+## Test procedure
+
+### Quick local test (no launchd)
+
+```sh
+# Build
+make clean && make
+
+# Start on a temporary port
+./port-protector 9396 &
+pid=$!
+
+# Verify response (daemon writes raw text, not HTTP)
+curl --http0.9 127.0.0.1:9396
+
+# Stop
+kill "$pid"
+wait "$pid" 2>/dev/null || true
+```
+
+### launchd lifecycle test (macOS)
+
+```sh
+# Install and start
+sudo make install
+
+# Verify launchd state
+sudo launchctl print system/com.local.port-protector | head -n 40
+
+# Verify port behavior
+curl --http0.9 127.0.0.1:9292
+
+# Uninstall and remove artifacts
+sudo make uninstall
+
+# Confirm service is gone
+sudo launchctl print system/com.local.port-protector 2>/dev/null || true
+
+# Confirm port is no longer occupied
+curl --http0.9 --max-time 1 127.0.0.1:9292 || true
+```
+
+### Testing pitfalls
+
+- This daemon serves plain TCP text and closes the socket; `curl` can show the message and still return a non-zero exit code.
+- Use `127.0.0.1` instead of `localhost` to avoid IPv6/IPv4 ambiguity in tests.
+- Prefer `sudo launchctl print system/<label>` over `launchctl list` for authoritative daemon state.
+
 ## Future ideas
 
-- [Factor out go-away message to a constant string](https://github.com/doolin/port-occupier/issues/2)
-- [Configurable message via flag or env var](https://github.com/doolin/port-occupier/issues/1)
+- [Factor out go-away message to a constant string](https://github.com/doolin/port-protector/issues/2)
+- [Configurable message via flag or env var](https://github.com/doolin/port-protector/issues/1)
 - Occupy multiple ports from a config file
 - launchd plist / systemd unit for auto-start
 - Log connection attempts (who tried to bind?)

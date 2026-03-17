@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.local.port-occupier</string>
+    <string>com.local.port-protector</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/port-occupier</string>
+        <string>/usr/local/bin/port-protector</string>
         <string>9292</string>
     </array>
     <key>RunAtLoad</key>
@@ -14,6 +14,6 @@
     <key>KeepAlive</key>
     <true/>
     <key>StandardErrorPath</key>
-    <string>/usr/local/var/log/port-occupier.log</string>
+    <string>/usr/local/var/log/port-protector.log</string>
 </dict>
 </plist>
